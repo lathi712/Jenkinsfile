@@ -1,13 +1,28 @@
 pipeline {
+
+    environment {
+        registry = "us.gcr.io"
+        //registryCredential = 'dockerhub'
+        dockerImage = ''
+    }
+    
     agent {
         docker {
             image 'maven:3-alpine'
             args '-v /root/.m2:/root/.m2'
         }
     }
+    // stage('Cloning Git') {
+    //   steps {
+    //     git 'https://github.com/gustavoapolinario/microservices-node-example-todo-frontend.git'
+    //   }
+    // }
+    
     options {
         skipStagesAfterUnstable()
+    
     }
+    
     stages {
         stage('Build') {
             steps {
@@ -24,9 +39,30 @@ pipeline {
                 }
             }
         }
-        stage('Deliver') { 
-            steps {
-                sh './jenkins/scripts/deliver.sh' 
+        stage('Building image') {
+            steps{
+                script {
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER"
+                }
+            }
+        }
+        stage('Deploy Image') {
+            steps{
+                script {
+                    docker.withRegistry( '') {
+                    dockerImage.push()
+                    }
+                }
+            }
+        }
+        // stage('Deliver') { 
+        //     steps {
+        //         sh './jenkins/scripts/deliver.sh' 
+        //     }
+        // }
+        stage('Remove Unused docker image') {
+            steps{
+                sh "docker rmi $registry:$BUILD_NUMBER"
             }
         }
     }
