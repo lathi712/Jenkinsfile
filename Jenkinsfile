@@ -40,13 +40,15 @@ pipeline {
         //     }
         // }
         stage('Building image') {
-            agent any
-            steps{
-                sh 'docker build -t us.gcr.io/kubernetes-sbk/java:+${BUILD_NUMBER}'
-                // script {
-                //     dockerImage = docker.build registry + "java:$BUILD_NUMBER"
-                // }
+            agent {
+                docker {
+                //sh 'docker build -t us.gcr.io/kubernetes-sbk/java:+${BUILD_NUMBER}'
+                 script {
+                     dockerImage = docker.build registry + "java:$BUILD_NUMBER"
+                 }
             }
+            }
+            
         }
         stage('Deploy Image') {
             steps{
