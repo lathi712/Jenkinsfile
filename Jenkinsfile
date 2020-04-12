@@ -31,8 +31,10 @@ pipeline {
     stage('Deploy to GKE') {
             agent any
             steps{
-                sh "sed -i 's#us.gcr.io/kubernetes-sbk/java:latest#us.gcr.io/kubernetes-sbk/java:${BUILD_NUMBER}#g' deployment.yaml"
-                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                //step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                helm create springboot
+                sh "sed -i 's#us.gcr.io/kubernetes-sbk/java:latest#us.gcr.io/kubernetes-sbk/java:${BUILD_NUMBER}#g' $PWD/springboot/values.yaml"
+                helm install --name springboot ./springboot
         }
     }
 
