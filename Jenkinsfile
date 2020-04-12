@@ -34,7 +34,7 @@ pipeline {
                 //step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
                 sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-b --project kubernetes-sbk'
                 sh 'helm create springboot'
-                sh "sed -i 's#us.gcr.io/kubernetes-sbk/java:latest#us.gcr.io/kubernetes-sbk/java:${BUILD_NUMBER}#g' $PWD/springboot/values.yaml"
+                sh "sed -i 's#us.gcr.io/kubernetes-sbk/java:latest#us.gcr.io/kubernetes-sbk/java:${BUILD_NUMBER}#g' springboot/values.yaml"
                 sh 'helm install --name springboot ./springboot'
         }
     }
