@@ -1,71 +1,21 @@
 pipeline {
-
-    environment {
-        registry = "us.gcr.io/kubernetes-sbk/"
-        //registryCredential = 'dockerhub'
-        dockerImage = ''
-    }
-    
-    agent {
+  agent none
+  stages {
+    stage('Maven Install') {
+      agent {
         docker {
-            image 'maven:3-alpine'
-            args '-v /root/.m2:/root/.m2'
+          image 'maven:3.5.0'
         }
+      }
+      steps {
+        sh 'mvn clean install'
+      }
     }
-    // stage('Cloning Git') {
-    //   steps {
-    //     git 'https://github.com/gustavoapolinario/microservices-node-example-todo-frontend.git'
-    //   }
-    // }
-    
-    // options {
-    //     skipStagesAfterUnstable()
-    
-    // }
-    
-    stages {
-        stage('Build') {
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
-        }
-        // stage('Test') {
-        //     steps {
-        //         sh 'mvn test'
-        //     }
-        //     post {
-        //         always {
-        //             junit 'target/surefire-reports/*.xml'
-        //         }
-        //     }
-        // }
-        stage('Building image') {
-            agent any
-            steps{
-                sh 'docker build -t us.gcr.io/kubernetes-sbk/java:+${BUILD_NUMBER}'
-                // script {
-                //     dockerImage = docker.build registry + "java:$BUILD_NUMBER"
-                // }
-            }
-        }
-        stage('Deploy Image') {
-            steps{
-                script {
-                    docker.withRegistry( '') {
-                    dockerImage.push()
-                    }
-                }
-            }
-        }
-        // stage('Deliver') { 
-        //     steps {
-        //         sh './jenkins/scripts/deliver.sh' 
-        //     }
-        // }
-        stage('Remove Unused docker image') {
-            steps{
-                sh "docker rmi $registry:$BUILD_NUMBER"
-            }
-        }
+    stage('Docker Build') {
+      agent any
+      steps {
+        sh 'docker build -t shanem/spring-petclinic:latest .'
+      }
     }
+  }
 }
