@@ -15,9 +15,10 @@ pipeline {
     stage('Docker Build') {
       agent any
       steps {
+        sh 'gcloud auth configure-docker --quiet'
         sh 'docker build -t us.gcr.io/kubernetes-sbk/java:${BUILD_NUMBER} .'
         sh 'docker push us.gcr.io/kubernetes-sbk/java:${BUILD_NUMBER}'
-        sh 'gcloud auth configure-docker --quiet'
+       
       }
     }
 
