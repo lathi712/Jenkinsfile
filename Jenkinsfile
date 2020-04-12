@@ -41,9 +41,10 @@ pipeline {
         // }
         stage('Building image') {
             steps{
-                script {
-                    dockerImage = docker.build registry + "java:$BUILD_NUMBER"
-                }
+                sh 'docker build -t us.gcr.io/kubernetes-sbk/java:'+$BUILD_NUMBER
+                // script {
+                //     dockerImage = docker.build registry + "java:$BUILD_NUMBER"
+                // }
             }
         }
         stage('Deploy Image') {
